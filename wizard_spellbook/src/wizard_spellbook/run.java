@@ -6,7 +6,7 @@ import java.util.*;
 //TODO better optimize the spell class esp. attacks so that attacks with no attack are better stored
 //TODO further testing, esp creating spell book in app
 public class run {
-	public static void main(){
+	public static void main(String[] args){
 		Scanner scan = new Scanner(System.in);
 		Scanner fscan = null;
 		spellbook sb = new spellbook();
