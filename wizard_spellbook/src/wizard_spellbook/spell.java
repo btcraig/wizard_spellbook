@@ -11,7 +11,9 @@ public class spell {
 	private boolean prep;
 	private type type;
 	private LinkedList<String> kw; //linked list because fuck resizing arrays
+	private boolean cast;
 	
+
 	/**
 	 * Empty constructor.
 	 * Creates empty variables for all associated data in a spell.
@@ -29,6 +31,7 @@ public class spell {
 		act = new action();
 		prep = false;
 		kw = new LinkedList<String>();
+		cast = false;
 	}
 	
 	/**
@@ -59,6 +62,7 @@ public class spell {
 		type = ty; //this line isnt confusing at all
 		prep = p;
 		kw = keys;
+		cast = false;
 	}
 	
 	public String toString(){
@@ -67,6 +71,13 @@ public class spell {
 	}
 	
 	/* getters and setters follow */
+	public boolean isCast() {
+		return cast;
+	}
+	
+	public void setCast(boolean cast) {
+		this.cast = cast;
+	}
 	
 	public String getTarget() {
 		return target;
