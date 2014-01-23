@@ -49,7 +49,7 @@ public class spellbook {
 				ret += s.getTarget() + nl;//Target
 				ret += s.getAtk().toString() + nl;
 				ret += s.getText() + nl;
-				ret += "Prepared: " + s.isPrep() + nl + nl;
+				ret += "Prepared: " + s.isPrep() + nl;
 			}
 		}
 		return ret;
@@ -73,8 +73,17 @@ public class spellbook {
 					ret += s.getTarget() + nl;//Target
 					ret += s.getAtk().toString() + nl;
 					ret += s.getText() + nl;
-					ret += "Prepared: " + s.isPrep() + nl + nl;
 				} else continue;
+			}
+		}
+		return ret;
+	}
+	
+	public String toString(){
+		String ret = "";
+		for(LinkedList<spell> ll : hm.values()){
+			for(spell s : ll){
+				ret+=s+"ENDL";//we add ENDL here so that when we write it out to file we get the expected behavior when loading again
 			}
 		}
 		return ret;

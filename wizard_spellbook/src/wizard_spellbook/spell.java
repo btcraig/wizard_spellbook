@@ -63,7 +63,7 @@ public class spell {
 	
 	public String toString(){
 		return name+";"+type.getT()+";"+level+";"+rchg.getrchg()+";"+kw+";"+act.getact()+";"+
-				range+";"+target+";"+atk.getSrc()+","+atk.getAgainst()+";"+text+";"+prep;		
+				range+";"+target+";"+atk+";"+text+";"+prep;		
 	}
 	
 	/* getters and setters follow */

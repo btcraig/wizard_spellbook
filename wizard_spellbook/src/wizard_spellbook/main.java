@@ -5,13 +5,12 @@ import java.util.*;
 public class main {
 	public static void main(String[] args){
 		Scanner scan = new Scanner(System.in);
-		BufferedReader br = null;
+		Scanner fscan = null;
 		BufferedWriter bw;
-		String name;
 		spellbook sb = new spellbook();
 		String nl = "\r\n";
 		String info = "If you wish to manually build a spellbook the format of the file should be as such:"+nl+
-				"name;type value;level;recharge value;[keyword1, keyword2, ...];action value,range,target,attack value,text,prep"+nl+
+				"name;type value;level;recharge value;keyword1, keyword2, ...;action value,range,target,attack value,text,prep"+nl+
 				"type value - an integer"+nl+
 				"\t0 - an attack power"+nl+
 				"\t1 - a utility power"+nl+
@@ -30,7 +29,19 @@ public class main {
 				"\tthe format should be as follows (Attack Type) vs./v (Defense Type). ex Wis vs. Will, Str v Fort"+nl+
 				"\t\tThe white-space here is important, the formatting of the actual text is personal preference, for exampl St v Fo is a valid input"+nl+
 				"\t\tBut StrvFort and Strv Fort are not."+nl+
-				"prep - either true or false";
+				"prep - either true or false"+nl+
+				"Special Note: This application uses special line detection, when entering powers into the sbook file use a standard new line for each new line in a power text."+nl+
+				"Example: If a power has a Hit and and Effect line enter the hit line then simply hit enter and enter the Effect line.";
+		String menu = "You're now at the main menu!"+nl+
+				"Options:"+nl+
+				"l - list all spells"+nl+
+				"lp - list all prepared spells"+nl+
+				"lc - list castable spells (spells that have yet to be cast since last rest (NYI)"+nl+
+				"sr - take a short rest and reset all encounter powers to uncast state (NYI)"+nl+
+				"er - take an extended rest and reset all encounter and daily powers to uncast state (NYI)"+nl+
+				"s - save the spell book to a file."+nl+
+				"cast - cast a spell. Casting an at-will spell has no effect."+nl+
+				"p - access options for altering which spells are prepared (NYI)";
 
 
 		//welcome message
@@ -63,21 +74,7 @@ public class main {
 		 */
 		if(in.equals("c")){
 			System.out.println("So you want to create a new spell book! That's great let's get started!"+nl+
-					"First: What is the character's name? This is going to be the file name as well!");
-			in = scan.next();
-			name = in;
-			System.out.println("Ok, so your name is going to be: " + name + nl + " Is that right (y/n)?");
-
-			in = scan.next();
-			while(!in.equals("y")){
-				System.out.println("In that case what name would you like to use?" + nl);
-				in = scan.next();
-				System.out.println("Ok, so your name is going to be: " + name + nl + " Is that right (y/n)?");
-			}
-			name = in;
-			System.out.println("Alright then, " + name + " let's get started putting that spell book together then!"+nl+
-					"Remember you can use to e exit and manually build your spell book in a csv and load it that way!"+nl+
-					"So let's take it from the top and add our first spell.");
+					"Let's get started and add our first spell.");
 
 			/* now we make spells one at a time */
 			//tvars
@@ -231,7 +228,8 @@ public class main {
 				}
 
 				try { // open the file for reading
-					br = new BufferedReader(new FileReader(fname));
+					fscan = new Scanner(new FileReader(fname));
+					fscan.useDelimiter("ENDL");
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				}
@@ -241,46 +239,40 @@ public class main {
 				String read;
 				String[] delim, keywords;
 				boolean tempb;
-				try {
-					while(br.ready()){
-						read = br.readLine();
-						delim = read.split(";"); // split on ; because there are going to be , elsewhere
-						// delim (should be) : 0 name, 1 type (int), 2 level (int), 3 rchg (int),
-						//						4 keywords (comma sep), 5 action (int), 6 range,
-						//						7 target, 8 attack (atk, def), 9 text, 10 prep
+				while(fscan.hasNext()){
+					read = fscan.next();
+					delim = read.split(";"); // split on ; because there are going to be , elsewhere
+					// delim (should be) : 0 name, 1 type (int), 2 level (int), 3 rchg (int),
+					//						4 keywords (comma sep), 5 action (int), 6 range,
+					//						7 target, 8 attack (atk, def), 9 text, 10 prep
 
-						LinkedList<String> tll = new LinkedList<String>();
-						String[] tkw = delim[4].split(",");
-						//build keyword list
-						for(int i=0;i<tkw.length;++i){
-							if(i==0) tll.add(tkw[i].substring(1));//this will drop off the [
-							else if(i==tkw.length-1) tll.add(tkw[i].substring(0, tkw[i].length()-1));//this will drop off the ]
-							else tll.add(tkw[i]);							
-						}
-
-						//fuck dealing with unnamed variables
-						String new_name = delim[0];
-						type new_type = new type(Integer.parseInt(delim[1]));
-						int new_level = Integer.parseInt(delim[2]);
-						recharge new_rchg = new recharge(Integer.parseInt(delim[3]));
-						action new_act = new action(Integer.parseInt(delim[5]));
-						String new_range = delim[6];
-						String new_target = delim[7];
-						String new_atk1, new_atk2;
-						String[] tatk = delim[8].split(" ");
-						new_atk1 = tatk[0];
-						new_atk2 = tatk[2];
-						attack new_atk = new attack(new_atk1,new_atk2);
-						String new_text = delim[9];
-						boolean new_prep = Boolean.parseBoolean(delim[10]);
-
-						spell new_spell = new spell(new_name, new_level, new_atk, new_text, new_range, 
-								new_target, new_rchg, new_act, new_prep, new_type, tll);
-
-						sb.addSpell(new_spell);
+					LinkedList<String> tll = new LinkedList<String>();
+					String[] tkw = delim[4].split(",");
+					//build keyword list
+					for(int i=0;i<tkw.length;++i){
+						tll.add(tkw[i]);							
 					}
-				} catch (IOException e) {
-					e.printStackTrace();
+
+					//fuck dealing with unnamed variables
+					String new_name = delim[0];
+					type new_type = new type(Integer.parseInt(delim[1]));
+					int new_level = Integer.parseInt(delim[2]);
+					recharge new_rchg = new recharge(Integer.parseInt(delim[3]));
+					action new_act = new action(Integer.parseInt(delim[5]));
+					String new_range = delim[6];
+					String new_target = delim[7];
+					String new_atk1, new_atk2;
+					String[] tatk = delim[8].split(" ");
+					new_atk1 = tatk[0];
+					new_atk2 = tatk[2];
+					attack new_atk = new attack(new_atk1,new_atk2);
+					String new_text = delim[9];
+					boolean new_prep = Boolean.parseBoolean(delim[10]);
+
+					spell new_spell = new spell(new_name, new_level, new_atk, new_text, new_range, 
+							new_target, new_rchg, new_act, new_prep, new_type, tll);
+
+					sb.addSpell(new_spell);
 				}
 			}
 
@@ -288,45 +280,61 @@ public class main {
 		/*-------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 		//TODO l and lp actual shit
-		System.out.println("You're now at the main menu!"+nl+
-				"Options:"+nl+
-				"l - list all spells"+nl+
-				"lp - list all prepared spells"+nl+
-				"lc - list castable spells (spells that have yet to be cast since last rest (NYI)"+nl+
-				"sr - take a short rest and reset all encounter powers to uncast state (NYI)"+nl+
-				"er - take an extended rest and reset all encounter and daily powers to uncast state (NYI)"+nl+
-				"s - save the spell book to a file <location of spell book app>/character-name.sbook (NYI)."+nl+
-				"cast - cast a spell. Casting an at-will spell has no effect."+nl+
-				"p - access options for altering which spells are prepared (NYI)"+nl+
-				"e - exit");
+		System.out.println(menu);
 		//TODO list castable, rests (requires iterating the hashtable for a, yet unmade, variable, save, casting, preparing spells.
 		//TODO first up is preparing spells, next work on getting spells able to be cast then work on setting up rests.
 		in = "";
+		boolean tmp = true;
 		while(scan.hasNext()){
 			in = scan.next();
+			if(!tmp) System.out.println(menu); else tmp=false; //print the menu but not initially
 			switch(in){
 			case "l":System.out.println(sb.list()); break;
 			case "lp":System.out.println(sb.list_prep()); break;
 			case "lc": break;
 			case "sr": break;
 			case "er": break;
-			case "s" : break;
+			case "s" : saveToFile(sb.toString(), scan); break;
 			case "cast": break;
 			case "p": break;
 			case "e": return;
-			default: System.out.println("You're now at the main menu!"+nl+
-					"Options:"+nl+
-					"l - list all spells"+nl+
-					"lp - list all prepared spells"+nl+
-					"lc - list castable spells (spells that have yet to be cast since last rest (NYI)"+nl+
-					"sr - take a short rest and reset all encounter powers to uncast state (NYI)"+nl+
-					"er - take an extended rest and reset all encounter and daily powers to uncast state (NYI)"+nl+
-					"s - save the spell book to a file <location of spell book app>/character-name.sbook (NYI)."+nl+
-					"cast - cast a spell. Casting an at-will spell has no effect."+nl+
-					"p - access options for altering which spells are prepared (NYI)");
+			default: System.out.println(menu);
 			break;
 			}
 		}
 		return;
+	}
+
+	public static void saveToFile(String data, Scanner s){
+		String name;
+		BufferedWriter bw;
+		FileWriter fw;
+		System.out.println("Saving your spell book.\r\n"+
+				"Where would you like to save your spell book?\r\n"+
+				"Please enter a fully qualified file path (C:\\Users\\<your user>\\My Documents\\<file name>.sbook\r\nIf you don't input a fully qualified path there is no guarantee your data will be saved.\r\nAlways check before exiting to ensure data saved correctly and maintain back ups");
+		name = s.next();
+		if(!name.contains(".sbook")) name += ".sbook"; // make sure to put the file ext in
+
+		//since when we build data we use the toString for a LL we know that [] will be present in the data and need to drop it off.
+		data = data.replaceAll("\\[", "");
+		data = data.replaceAll("]", "");
+
+		File file = new File(name);
+		if(!file.exists())
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		
+		try {
+			fw = new FileWriter(file.getAbsoluteFile());
+			bw = new BufferedWriter(fw);
+			bw.write(data);
+			bw.close();
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
