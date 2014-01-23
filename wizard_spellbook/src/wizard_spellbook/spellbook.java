@@ -1,18 +1,14 @@
 package wizard_spellbook;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.Map.Entry;
 
 public class spellbook {
-	private static  Hashtable<Integer, spell> ht;
+	private static  HashMap<Integer, LinkedList<spell>> hm;
 	public spellbook(){
-		ht = new Hashtable<Integer, spell>(30);
-	}
-
-	public spellbook(String s){
-		ht = new Hashtable<Integer, spell>(30);
-		//TODO constructors
+		hm = new HashMap<Integer, LinkedList<spell>>(30);
+		for(int i=0;i<30;++i){
+			hm.put(i, new LinkedList<spell>());
+		}
 	}
 
 	/**
@@ -20,29 +16,20 @@ public class spellbook {
 	 * @param s The constructed spell to add.
 	 * @return The spell added.
 	 */
-	public static spell addSpell(spell s){
-		return ht.put(s.getLevel(), s);	
+	public static void addSpell(spell s){
+		hm.get(s.getLevel()).add(s);	
 	}
 
-	/**
-	 * Remove a spell from the spell book.
-	 * @param s The spell to remove
-	 * @return The removed spell.
-	 */
-	public spell removeSpell(spell s){
-		return ht.remove(s);
-	}
 
 	/**
 	 * See spell documentation for info.
 	 * Use the main class to get keywords and insert them to a LL to pass to this.
 	 * {@link wizard_spellbook.spell}
 	 */
-	public spell createSpell(String s, int i, attack a, String t, String ra, String ta, 
+	public void createSpell(String s, int i, attack a, String t, String ra, String ta, 
 			recharge r, action ac, boolean p, type ty, LinkedList<String> keys){
 
 		spell sp = new spell(s, i, a, t, ra, ta, r, ac, p, ty, keys);
-		return spellbook.addSpell(sp);
 	}
 
 	/**
@@ -53,16 +40,17 @@ public class spellbook {
 		String ret;
 		String nl = "\r\n";
 		ret = "";
-		for(Entry<Integer, spell> e : ht.entrySet()){
-			//construct the 'power card'
-			spell sp = e.getValue();
-			ret += sp.getName() + " " + sp.getType().toString() + " " + sp.getLevel() + nl; //Name (Attack/Utility) Level
-			ret += sp.getRchg().toString() + " ** " + sp.getKw().toString() + nl; //Recharge ** Keywords
-			ret += sp.getAct().toString() + " " + sp.getRange() + nl; //Action Range
-			ret += sp.getTarget() + nl;//Target
-			ret += sp.getAtk().toString() + nl;
-			ret += sp.getText() + nl;
-			ret += "Prepared: " + sp.isPrep() + nl + nl;
+		for(LinkedList<spell> ll : hm.values()){
+			for(spell s : ll){
+				//construct the 'power card'
+				ret += s.getName() + " " + s.getType().toString() + " " + s.getLevel() + nl; //Name (Attack/Utility) Level
+				ret += s.getRchg().toString() + " ** " + s.getKw().toString() + nl; //Recharge ** Keywords
+				ret += s.getAct().toString() + " " + s.getRange() + nl; //Action Range
+				ret += s.getTarget() + nl;//Target
+				ret += s.getAtk().toString() + nl;
+				ret += s.getText() + nl;
+				ret += "Prepared: " + s.isPrep() + nl + nl;
+			}
 		}
 		return ret;
 	}
@@ -75,32 +63,20 @@ public class spellbook {
 		String ret;
 		String nl = "\r\n";
 		ret = "";
-		for(Entry<Integer, spell> e : ht.entrySet()){
-			//construct the 'power card'
-			spell sp = e.getValue();
-			if(sp.isPrep()){
-				ret += sp.getName() + " " + sp.getType() + " " + sp.getLevel() + nl; //Name (Attack/Utility) Level
-				ret += sp.getRchg() + " ** " + sp.getKw() + nl; //Recharge ** Keywords
-				ret += sp.getAct() + " " + sp.getRange() + nl; //Action Range
-				ret += sp.getTarget() + nl;//Target
-				ret += sp.getAtk() + nl;
-				ret += sp.getText() + nl;
-			} else continue;
+		for(LinkedList<spell> ll : hm.values()){
+			for(spell s : ll){
+				if(s.isPrep()){
+					//construct the 'power card'
+					ret += s.getName() + " " + s.getType().toString() + " " + s.getLevel() + nl; //Name (Attack/Utility) Level
+					ret += s.getRchg().toString() + " ** " + s.getKw().toString() + nl; //Recharge ** Keywords
+					ret += s.getAct().toString() + " " + s.getRange() + nl; //Action Range
+					ret += s.getTarget() + nl;//Target
+					ret += s.getAtk().toString() + nl;
+					ret += s.getText() + nl;
+					ret += "Prepared: " + s.isPrep() + nl + nl;
+				} else continue;
+			}
 		}
-		return ret;
-	}
-	
-	/**
-	 * Creates a string of all spells in the book for writing out to a file.
-	 * Format is the same as a CSV.
-	 * @return
-	 */
-	public String toFile(){
-		String ret = "";
-		for(Entry<Integer, spell> e : ht.entrySet()){
-			spell sp = e.getValue();
-			ret += sp;
-		}		
 		return ret;
 	}
 }

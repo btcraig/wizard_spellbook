@@ -254,7 +254,7 @@ public class main {
 						//build keyword list
 						for(int i=0;i<tkw.length;++i){
 							if(i==0) tll.add(tkw[i].substring(1));//this will drop off the [
-							else if(i==tkw.length-1) tll.add(tkw[i].substring(tkw[i].length()-1));//this will drop off the ]
+							else if(i==tkw.length-1) tll.add(tkw[i].substring(0, tkw[i].length()-1));//this will drop off the ]
 							else tll.add(tkw[i]);							
 						}
 
