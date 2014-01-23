@@ -197,7 +197,7 @@ public class main {
 		System.out.println("You're now at the main menu!"+nl+
 				"Options:"+nl+
 				"l - list all spells"+nl+
-				"lp - list all prepared spells");
+				"lp dadada- list all prepared spells");
 		System.out.println(sb.list());		
 		return;
 	}
