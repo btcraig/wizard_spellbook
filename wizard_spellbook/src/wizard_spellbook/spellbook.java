@@ -43,7 +43,9 @@ public class spellbook {
 		for(LinkedList<spell> ll : hm.values()){
 			for(spell s : ll){
 				//construct the 'power card'
-				ret += s.getName() + " " + s.getType().toString() + " " + s.getLevel() + nl; //Name (Attack/Utility) Level
+				ret += s.getName() + " " + s.getType().toString() + " " + s.getLevel(); //Name (Attack/Utility) Level
+				if(!s.isCast()) ret += " [ ]" + nl;
+				else ret+= " [X]" + nl;
 				ret += s.getRchg().toString() + " ** " + s.getKw().toString() + nl; //Recharge ** Keywords
 				ret += s.getAct().toString() + " " + s.getRange() + nl; //Action Range
 				ret += s.getTarget() + nl;//Target
@@ -67,6 +69,32 @@ public class spellbook {
 			for(spell s : ll){
 				if(s.isPrep()){
 					//construct the 'power card'
+					ret += s.getName() + " " + s.getType().toString() + " " + s.getLevel(); //Name (Attack/Utility) Level
+					if(!s.isCast()) ret += " [ ]" + nl;
+					else ret+= " [X]" + nl;
+					ret += s.getRchg().toString() + " ** " + s.getKw().toString() + nl; //Recharge ** Keywords
+					ret += s.getAct().toString() + " " + s.getRange() + nl; //Action Range
+					ret += s.getTarget() + nl;//Target
+					ret += s.getAtk().toString() + nl;
+					ret += s.getText() + nl;
+				} else continue;
+			}
+		}
+		return ret;
+	}
+
+	/**
+	 * List only the prepared spells that have not been cast
+	 * @return
+	 */
+	public String list_cast(){
+		String ret;
+		String nl = "\r\n";
+		ret = "";
+		for(LinkedList<spell> ll : hm.values()){
+			for(spell s : ll){
+				if(s.isPrep() && !s.isCast()){
+					//construct the 'power card'
 					ret += s.getName() + " " + s.getType().toString() + " " + s.getLevel() + nl; //Name (Attack/Utility) Level
 					ret += s.getRchg().toString() + " ** " + s.getKw().toString() + nl; //Recharge ** Keywords
 					ret += s.getAct().toString() + " " + s.getRange() + nl; //Action Range
@@ -78,7 +106,30 @@ public class spellbook {
 		}
 		return ret;
 	}
-	
+
+	/**
+	 * Iterate the spell book and set all encounter powers to not be cast yet.
+	 */
+	public void shortRest(){
+		for(LinkedList<spell> ll : hm.values()){
+			for(spell s : ll){
+				if(s.getRchg().getrchg()==1) s.setCast(false); //could be more optimal and check if cast already but meh
+				else continue;
+			}
+		}
+	}
+
+	/**
+	 * Iterate over the spell book and set all powers to not be cast yet.
+	 */
+	public void extRest(){
+		for(LinkedList<spell> ll : hm.values()){
+			for(spell s : ll){
+				s.setCast(false); //could be more optimal and check if cast already but meh
+			}
+		}
+	}
+
 	public String toString(){
 		String ret = "";
 		for(LinkedList<spell> ll : hm.values()){
@@ -88,4 +139,14 @@ public class spellbook {
 		}
 		return ret;
 	}
+
+	/**
+	 * Return the list of spells for the given level
+	 * @param i The level to find
+	 * @return The list
+	 */
+	public LinkedList<spell> getSpellByLevel(int i){
+		return hm.get(i);
+	}
+
 }
