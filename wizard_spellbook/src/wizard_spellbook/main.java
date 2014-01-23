@@ -18,13 +18,13 @@ public class main {
 				"\t0 - at-will"+nl+
 				"\t1 - encounter"+nl+
 				"\t2 - daily"+nl+
-				"\t3 - special (NYI)"+nl+
+				"\t3 - special"+nl+
 				"action value - an integer between 0 and 4"+nl+
 				"\t0 - free/no action"+nl+
 				"\t1 - minor"+nl+
 				"\t2 - move"+nl+
 				"\t3 - standard"+nl+
-				"\t4 - special (NYI)"+nl+
+				"\t4 - special"+nl+
 				"attack value - a specially formatted line"+nl+
 				"\tthe format should be as follows (Attack Type) vs./v (Defense Type). ex Wis vs. Will, Str v Fort"+nl+
 				"\t\tThe white-space here is important, the formatting of the actual text is personal preference, for exampl St v Fo is a valid input"+nl+
@@ -36,9 +36,9 @@ public class main {
 				"Options:"+nl+
 				"l - list all spells"+nl+
 				"lp - list all prepared spells"+nl+
-				"lc - list castable spells (spells that have yet to be cast since last rest (NYI)"+nl+
-				"sr - take a short rest and reset all encounter powers to uncast state (NYI)"+nl+
-				"er - take an extended rest and reset all encounter and daily powers to uncast state (NYI)"+nl+
+				"lc - list castable spells (spells that have yet to be cast since last rest"+nl+
+				"sr - take a short rest and reset all encounter powers to uncast state"+nl+
+				"er - take an extended rest and reset all encounter and daily powers to uncast state"+nl+
 				"s - save the spell book to a file."+nl+
 				"cast - cast a spell. Casting an at-will spell has no effect."+nl+
 				"p - access options for altering which spells are prepared (NYI)";
@@ -48,10 +48,10 @@ public class main {
 		String in;
 		System.out.println("Welcome to btcraig's Wizard Spell Book Utility!"+nl+
 				"To begin you may either open a spell book or create a new one."+nl+
-				"At any time you are asked for input you can always press e to exit this program, but be careful you may lose data if you're not careful!!"+nl+
+				"This is rough thrown together application. Very little error checking is performed and user input is not verified in most cases. Be careful and use at your own risk!"+nl+
 				"o - open a spell book"+nl+
 				"c - create a new spell book"+nl+
-				"i - info on manually building a spell book. This will provide you the information if you wish to manually construct a CSV file for your spell book.");
+				"i - info on manually building a spell book. This will provide you the information if you wish to manually construct a file for your spell book.");
 		in = scan.next();
 		while( !in.equals("o") && !in.equals("c") && !in.equals("i")){
 			System.out.println("That is not a valid selection. Please select open or new (o, or c).");
@@ -278,29 +278,27 @@ public class main {
 
 		}
 		/*-------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-
-		//TODO l and lp actual shit
 		System.out.println(menu);
-		//TODO list castable, rests (requires iterating the hashtable for a, yet unmade, variable, save, casting, preparing spells.
+		//TODO list castable, rests (requires iterating the hashtable for a, yet unmade, variable, casting, preparing spells.
 		//TODO first up is preparing spells, next work on getting spells able to be cast then work on setting up rests.
 		in = "";
 		boolean tmp = true;
 		while(scan.hasNext()){
 			in = scan.next();
-			if(!tmp) System.out.println(menu); else tmp=false; //print the menu but not initially
 			switch(in){
-			case "l":System.out.println(sb.list()); break;
-			case "lp":System.out.println(sb.list_prep()); break;
-			case "lc": break;
-			case "sr": break;
-			case "er": break;
+			case "l": System.out.println(sb.list()); break;
+			case "lp": System.out.println(sb.list_prep()); break;
+			case "lc": System.out.println(sb.list_cast()); break;
+			case "sr": sb.shortRest(); System.out.println("Taking a short rest\r\n"); break;
+			case "er": sb.extRest(); System.out.println("Taking an extended rest\r\n"); break;
 			case "s" : saveToFile(sb.toString(), scan); break;
-			case "cast": break;
+			case "cast": castSpell(sb, scan); break;
 			case "p": break;
 			case "e": return;
 			default: System.out.println(menu);
 			break;
 			}
+			if(!tmp) System.out.println(menu); else tmp=false; //print the menu but not initially
 		}
 		return;
 	}
@@ -326,7 +324,7 @@ public class main {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		
+
 		try {
 			fw = new FileWriter(file.getAbsoluteFile());
 			bw = new BufferedWriter(fw);
@@ -335,6 +333,40 @@ public class main {
 			fw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	public static void castSpell(spellbook sb, Scanner scan){
+		String sp, in, ret;
+		ret = "";
+		String nl = "\r\n";
+		int level;
+		System.out.println("What level is the spell?");
+		level = scan.nextInt();
+		LinkedList<spell> ll = sb.getSpellByLevel(level);
+		if(ll == null) System.out.println("No spells at that level!");
+		else{
+			int i = 0;
+			for(spell s : ll){ //print each spell with an index
+				ret += i + ". " + s.getName() + " " + s.getType().toString() + " " + s.getLevel(); //Name (Attack/Utility) Level
+				if(!s.isCast()) ret += " [ ]" + nl;
+				else ret+= " [X]" + nl;
+				ret += s.getRchg().toString() + " ** " + s.getKw().toString() + nl; //Recharge ** Keywords
+				ret += s.getAct().toString() + " " + s.getRange() + nl; //Action Range
+				ret += s.getTarget() + nl;//Target
+				ret += s.getAtk().toString() + nl;
+				ret += s.getText() + nl;
+				++i;
+				System.out.println(ret);
+				ret = "";
+			}
+			System.out.println("Which spell do you want to cast (index)?");
+			level = scan.nextInt();
+			if(level>=ll.size()) System.out.println("No such spell!");
+			else {
+				System.out.println("Casting " + ll.get(level).getName());
+				ll.get(level).setCast(true);
+			}
 		}
 	}
 }
