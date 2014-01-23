@@ -5,41 +5,28 @@ import java.util.*;
 public class main {
 	public static void main(String[] args){
 		Scanner scan = new Scanner(System.in);
-		BufferedReader br;
+		BufferedReader br = null;
 		BufferedWriter bw;
 		String name;
 		spellbook sb = new spellbook();
 		String nl = "\r\n";
-		/* test block
-		LinkedList<String> ll = new LinkedList<String>();
-		ll.add("Arcane");
-		ll.add("Evocation");
-		ll.add("Implement");
-		ll.add("Thunder");
-		spell sp = new spell("Thunderwave",1,new attack("Int","Fort"),
-							"1d6 + Int mod damage and you push each creature up to Wis mod squares.",
-							"Close Blast 3",
-							"Each creature in the blast",
-							0,
-							3,
-							true,
-							0,
-							ll);
-		s.addSpell(sp);
-		System.out.print(s.list());
-		 */
 
+
+		//welcome message
 		String in;
 		System.out.println("Welcome to btcraig's Wizard Spell Book Utility!"+nl+
 				"To begin you may either open a spell book or create a new one."+nl+
 				"At any time you are asked for input you can always press e to exit this program, but be careful you may lose data if you're not careful!!"+nl+
-				"o - open a spell book"+nl+"c - create a new spell book"+nl+"i - info on manually building a spell book. This will provide you the information if you wish to manuall construct a CSV file for your spell book."+nl+nl);
+				"o - open a spell book"+nl+"c - create a new spell book"+nl+
+				"i - info on manually building a spell book. This will provide you the information if you wish to manually construct a CSV file for your spell book.");
 		in = scan.next();
 		while( !in.equals("o") && !in.equals("c")){
-			System.out.println("That is not a valid selection. Please select open or new (o, or c)."+nl);
+			System.out.println("That is not a valid selection. Please select open or new (o, or c).");
 			in = scan.next();
 		}
 
+
+		/*-------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 		/*
 		 * Creating a new spell book
 		 * First we get the name for the character (which will also serve as the file name).
@@ -50,18 +37,18 @@ public class main {
 					"First: What is the character's name? This is going to be the file name as well!");
 			in = scan.next();
 			name = in;
-			System.out.println("Ok, so your name is going to be: " + name + nl + " Is that right (y/n)?" + nl);
+			System.out.println("Ok, so your name is going to be: " + name + nl + " Is that right (y/n)?");
 
 			in = scan.next();
 			while(!in.equals("y")){
 				System.out.println("In that case what name would you like to use?" + nl);
 				in = scan.next();
-				System.out.println("Ok, so your name is going to be: " + name + nl + " Is that right (y/n)?" + nl);
+				System.out.println("Ok, so your name is going to be: " + name + nl + " Is that right (y/n)?");
 			}
 			name = in;
 			System.out.println("Alright then, " + name + " let's get started putting that spell book together then!"+nl+
 					"Remember you can use to e exit and manually build your spell book in a csv and load it that way!"+nl+
-					"So let's take it from the top and add our first spell."+nl);
+					"So let's take it from the top and add our first spell.");
 
 			/* now we make spells one at a time */
 			//tvars
@@ -112,7 +99,7 @@ public class main {
 						rchg = new recharge(scan.nextInt());
 						break;
 					} catch (InputMismatchException e) {
-						System.out.println("Your input was not valid! Try again."+nl);				
+						System.out.println("Your input was not valid! Try again.");				
 					}
 				}
 
@@ -184,20 +171,91 @@ public class main {
 					}
 				}
 
-				
+
 				temp = new spell(s_name, level, atk, text, range, target, rchg, act, prep, t, kw);
 				spellbook.addSpell(temp);
 				//check to add another spell if true continue else we break out and go to the main menu
 				if(cont) continue;
 				else break;
 			}
-		} else {}
-		
+
+			/*-------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+			/* Open a spell book from file */
+		} else {
+			String fname;
+			System.out.println("Ok, so you want to load a spell book!"+nl+
+					"Supported formats are .sbook"+nl+
+					"For info on how to format a .sbook file for manual creating and import press i");
+			fname  = scan.next();
+			if(fname.equals("i")) {} //TODO info on CSV format
+			else{
+				while(!fname.contains(".csv") && !fname.contains(".sbook")){
+					System.out.println("Invalid file format, try again!");
+					fname = scan.next();
+				}
+
+				try { // open the file for reading
+					br = new BufferedReader(new FileReader(fname));
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
+
+				//start reading lines
+				//format: name,type,level,rchg,[kwlist],act,range,target,atk,text,prep
+				String read;
+				String[] delim, keywords;
+				boolean tempb;
+				try {
+					while(br.ready()){
+						read = br.readLine();
+						delim = read.split(";"); // split on ; because there are going to be , elsewhere
+						// delim (should be) : 0 name, 1 type (int), 2 level (int), 3 rchg (int),
+						//						4 keywords (comma sep), 5 action (int), 6 range,
+						//						7 target, 8 attack (atk, def), 9 text, 10 prep
+						
+						LinkedList<String> tll = new LinkedList<String>();
+						String[] tkw = delim[4].split(",");
+						//build keyword list, might need to work some magic to get rid of the [] used by linked lists
+						for(int i=0;i<tkw.length;++i){
+							tll.add(tkw[i]);							
+						}
+						
+						//fuck dealing with unnamed variables
+						String new_name = delim[0];
+						type new_type = new type(Integer.parseInt(delim[1]));
+						int new_level = Integer.parseInt(delim[2]);
+						recharge new_rchg = new recharge(Integer.parseInt(delim[3]));
+						action new_act = new action(Integer.parseInt(delim[5]));
+						String new_range = delim[6];
+						String new_target = delim[7];
+						String new_atk1, new_atk2;
+						String[] tatk = delim[8].split(",");
+						new_atk1 = tatk[0];
+						new_atk2 = tatk[2];
+						attack new_atk = new attack(new_atk1,new_atk2);
+						String new_text = delim[9];
+						boolean new_prep = Boolean.parseBoolean(delim[10]);
+						
+						spell new_spell = new spell(new_name, new_level, new_atk, new_text, new_range, 
+													new_target, new_rchg, new_act, new_prep, new_type, tll);
+						
+						sb.addSpell(new_spell);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+		/*-------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
 		//TODO l and lp actual shit
 		System.out.println("You're now at the main menu!"+nl+
 				"Options:"+nl+
 				"l - list all spells"+nl+
-				"lp dadada- list all prepared spells");
+				"lp - list all prepared spells"+nl+
+				"s - save the spell book to a file <location of spell book app>/character-name.sbook.");
 		System.out.println(sb.list());		
 		return;
 	}

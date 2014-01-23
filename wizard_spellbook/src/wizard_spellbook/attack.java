@@ -19,6 +19,12 @@ public class attack {
 		against = a;
 	}
 	
+	public attack(String s){
+		String[] temp = s.split(" ");
+		src = temp[0];
+		against = temp[2];
+	}
+	
 	/**
 	 * Get the src of the attack (Wis, Str, etc)
 	 * @return The type of the attack

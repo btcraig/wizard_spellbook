@@ -33,6 +33,7 @@ public class spell {
 	
 	/**
 	 * Primary constructor.
+	 * @param name The name of the spell.
 	 * @param i Level of the spell.
 	 * @param a The object to use for the attack
 	 * @param t The text of the spell (effect and hit lines).
@@ -41,6 +42,7 @@ public class spell {
 	 * @param r The recharge object of the spell.
 	 * @param ac The action of the spell.
 	 * @param p Whether or not the spell is prepared.
+	 * @param ty The type of the spell (utility, attack)
 	 * @param keys The keywords of the spell.
 	 */
 	public spell(String s, int i, attack a, String t, String ra, 
@@ -58,7 +60,12 @@ public class spell {
 		prep = p;
 		kw = keys;
 	}
-
+	
+	public String toString(){
+		return name+";"+type.getT()+";"+level+";"+rchg.getrchg()+";"+kw+";"+act.getact()+";"+
+				range+";"+target+";"+atk.getSrc()+","+atk.getAgainst()+";"+text+";"+prep;		
+	}
+	
 	/* getters and setters follow */
 	
 	public String getTarget() {

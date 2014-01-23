@@ -9,12 +9,12 @@ public class spellbook {
 	public spellbook(){
 		ht = new Hashtable<Integer, spell>(30);
 	}
-	
+
 	public spellbook(String s){
 		ht = new Hashtable<Integer, spell>(30);
 		//TODO constructors
 	}
-	
+
 	/**
 	 * Add the spell to the spell book.
 	 * @param s The constructed spell to add.
@@ -23,7 +23,7 @@ public class spellbook {
 	public static spell addSpell(spell s){
 		return ht.put(s.getLevel(), s);	
 	}
-	
+
 	/**
 	 * Remove a spell from the spell book.
 	 * @param s The spell to remove
@@ -32,7 +32,7 @@ public class spellbook {
 	public spell removeSpell(spell s){
 		return ht.remove(s);
 	}
-	
+
 	/**
 	 * See spell documentation for info.
 	 * Use the main class to get keywords and insert them to a LL to pass to this.
@@ -40,11 +40,11 @@ public class spellbook {
 	 */
 	public spell createSpell(String s, int i, attack a, String t, String ra, String ta, 
 			recharge r, action ac, boolean p, type ty, LinkedList<String> keys){
-		
+
 		spell sp = new spell(s, i, a, t, ra, ta, r, ac, p, ty, keys);
 		return spellbook.addSpell(sp);
 	}
-	
+
 	/**
 	 * List all spells in the spell book.
 	 * @return A really big string that contains all the powers.
@@ -66,14 +66,41 @@ public class spellbook {
 		}
 		return ret;
 	}
-	
+
 	/**
 	 * List only the prepared spells in the spell book.
 	 * @return
 	 */
 	public String list_prep(){
-		
-		return null;
+		String ret;
+		String nl = "\r\n";
+		ret = "";
+		for(Entry<Integer, spell> e : ht.entrySet()){
+			//construct the 'power card'
+			spell sp = e.getValue();
+			if(sp.isPrep()){
+				ret += sp.getName() + " " + sp.getType() + " " + sp.getLevel() + nl; //Name (Attack/Utility) Level
+				ret += sp.getRchg() + " ** " + sp.getKw() + nl; //Recharge ** Keywords
+				ret += sp.getAct() + " " + sp.getRange() + nl; //Action Range
+				ret += sp.getTarget() + nl;//Target
+				ret += sp.getAtk() + nl;
+				ret += sp.getText() + nl;
+			} else continue;
+		}
+		return ret;
 	}
 	
+	/**
+	 * Creates a string of all spells in the book for writing out to a file.
+	 * Format is the same as a CSV.
+	 * @return
+	 */
+	public String toFile(){
+		String ret = "";
+		for(Entry<Integer, spell> e : ht.entrySet()){
+			spell sp = e.getValue();
+			ret += sp;
+		}		
+		return ret;
+	}
 }
