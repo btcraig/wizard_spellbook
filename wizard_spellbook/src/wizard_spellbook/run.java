@@ -1,12 +1,14 @@
 package wizard_spellbook;
 import java.io.*;
 import java.util.*;
-
-public class main {
-	public static void main(String[] args){
+//TODO preparing spells
+//TODO more searching tools ex by recharge, by level, etc
+//TODO better optimize the spell class esp. attacks so that attacks with no attack are better stored
+//TODO further testing, esp creating spell book in app
+public class run {
+	public static void main(){
 		Scanner scan = new Scanner(System.in);
 		Scanner fscan = null;
-		BufferedWriter bw;
 		spellbook sb = new spellbook();
 		String nl = "\r\n";
 		String info = "If you wish to manually build a spellbook the format of the file should be as such:"+nl+
@@ -237,8 +239,7 @@ public class main {
 				//start reading lines
 				//format: name,type,level,rchg,[kwlist],act,range,target,atk,text,prep
 				String read;
-				String[] delim, keywords;
-				boolean tempb;
+				String[] delim;
 				while(fscan.hasNext()){
 					read = fscan.next();
 					delim = read.split(";"); // split on ; because there are going to be , elsewhere
@@ -272,15 +273,14 @@ public class main {
 					spell new_spell = new spell(new_name, new_level, new_atk, new_text, new_range, 
 							new_target, new_rchg, new_act, new_prep, new_type, tll);
 
-					sb.addSpell(new_spell);
+					spellbook.addSpell(new_spell);
 				}
+				fscan.close();
 			}
 
 		}
 		/*-------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 		System.out.println(menu);
-		//TODO list castable, rests (requires iterating the hashtable for a, yet unmade, variable, casting, preparing spells.
-		//TODO first up is preparing spells, next work on getting spells able to be cast then work on setting up rests.
 		in = "";
 		boolean tmp = true;
 		while(scan.hasNext()){
@@ -303,6 +303,11 @@ public class main {
 		return;
 	}
 
+	/**
+	 * Save the spell book to a file
+	 * @param data The spell book data
+	 * @param s The scanner that reads System.in
+	 */
 	public static void saveToFile(String data, Scanner s){
 		String name;
 		BufferedWriter bw;
@@ -335,9 +340,14 @@ public class main {
 			e.printStackTrace();
 		}
 	}
-
+	
+	/**
+	 * Cast a specified spell in the book.
+	 * @param sb The spell book
+	 * @param scan The system.in scanner.
+	 */
 	public static void castSpell(spellbook sb, Scanner scan){
-		String sp, in, ret;
+		String ret;
 		ret = "";
 		String nl = "\r\n";
 		int level;

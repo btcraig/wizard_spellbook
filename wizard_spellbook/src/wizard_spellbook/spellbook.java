@@ -1,6 +1,5 @@
 package wizard_spellbook;
 import java.util.*;
-import java.util.Map.Entry;
 
 public class spellbook {
 	private static  HashMap<Integer, LinkedList<spell>> hm;
@@ -18,18 +17,6 @@ public class spellbook {
 	 */
 	public static void addSpell(spell s){
 		hm.get(s.getLevel()).add(s);	
-	}
-
-
-	/**
-	 * See spell documentation for info.
-	 * Use the main class to get keywords and insert them to a LL to pass to this.
-	 * {@link wizard_spellbook.spell}
-	 */
-	public void createSpell(String s, int i, attack a, String t, String ra, String ta, 
-			recharge r, action ac, boolean p, type ty, LinkedList<String> keys){
-
-		spell sp = new spell(s, i, a, t, ra, ta, r, ac, p, ty, keys);
 	}
 
 	/**
